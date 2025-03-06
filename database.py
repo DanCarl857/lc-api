@@ -8,9 +8,12 @@ load_dotenv()
 
 import os
 
-DATABASE_URL = os.getenv("DB_URL")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+DB_NAME = os.getenv("DB_NAME")
+DB_URL = f"mysql+pymysql://{USERNAME}:{PASSWORD}@localhost:3306/{DB_NAME}"
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DB_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

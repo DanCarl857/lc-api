@@ -4,6 +4,7 @@
 
 * You should have a `MySQL` database setup
 * Update the `.env` file with your credentials and database name
+* Follow [](database readme) to properly setup your database
 
 ## Getting Started
 
