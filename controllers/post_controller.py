@@ -21,6 +21,12 @@ def add_post(post: PostCreate, user_id: int, db: Session = Depends(SessionLocal)
     if len(post.text.encode("utf-8")) > 1_000_000:  # 1 MB limit
         raise HTTPException(status_code=400, detail="Payload too large")
     new_post = create_post(db, {"text": post.text, "user_id": user_id})
+
+    # Once we create a post we need to make sure the cache is updated
+    posts = get_posts_by_user(db, user_id)
+    set_cached_posts(user_id, posts)
+
+    # return the post_id we just created
     return {"post_id": new_post.id}
 
 def get_posts(user_id: int, db: Session = Depends(SessionLocal)):
@@ -34,11 +40,15 @@ def get_posts(user_id: int, db: Session = Depends(SessionLocal)):
     Returns:
         posts: All user's posts 
     """
+    # first check the cache for posts
     cached_posts = get_cached_posts(user_id)
     if cached_posts:
         return cached_posts
+
+    # Update the cache with all posts in the database
     posts = get_posts_by_user(db, user_id)
     set_cached_posts(user_id, posts)
+    
     return posts
 
 def delete_post(post_id: int, user_id: int, db: Session = Depends(SessionLocal)):
